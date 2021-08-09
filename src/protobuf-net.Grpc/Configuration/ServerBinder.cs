@@ -80,8 +80,10 @@ namespace ProtoBuf.Grpc.Configuration
 
                     if (argsBuffer is null)
                     {
+                        var marshallerFactory = new ValueTypeWrapperMarshallerFactory(binderConfiguration!.MarshallerCache);
+                        var marshallerCache = new MarshallerCache(new[] { marshallerFactory });
                         argsBuffer = new object?[9];
-                        argsBuffer[6] = binderConfiguration!.MarshallerCache;
+                        argsBuffer[6] = marshallerCache;
                         argsBuffer[7] = service is null ? null : Expression.Constant(service, serviceType);
                     }
                     argsBuffer[0] = serviceName;
@@ -163,7 +165,7 @@ namespace ProtoBuf.Grpc.Configuration
                     else
                     {
                         // basic - direct call
-                        return (TDelegate)Delegate.CreateDelegate(typeof(TDelegate), _service, Method);
+                        return (TDelegate)Delegate.CreateDelegate(typeof(TDelegate), _service?.Value, Method);
                     }
                 }
                 else
